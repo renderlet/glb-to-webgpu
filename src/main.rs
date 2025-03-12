@@ -17,7 +17,7 @@ use crate::app::App;
 async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
     let size = window.inner_size();
     let (surface, adapter) = {
-        let instance = wgpu::Instance::new(&Default::default());
+        let instance = wgpu::Instance::new(Default::default());
         let surface = instance.create_surface(Arc::clone(&window)).unwrap();
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {

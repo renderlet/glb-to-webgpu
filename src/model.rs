@@ -166,13 +166,13 @@ impl Model {
                 module: &shader,
                 entry_point: "vs_main".into(),
                 buffers: &[vertex_buf_layout],
-                compilation_options: Default::default(),
+                // compilation_options: Default::default(),
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
                 entry_point: "fs_main".into(),
                 targets: &[Some(swapchain_format.into())],
-                compilation_options: Default::default(),
+                // compilation_options: Default::default(),
             }),
             primitive: wgpu::PrimitiveState::default(),
             depth_stencil: Some(wgpu::DepthStencilState {
@@ -184,7 +184,7 @@ impl Model {
             }),
             multisample: wgpu::MultisampleState::default(),
             multiview: None,
-            cache: None,
+            // cache: None,
         });
 
         (
@@ -222,10 +222,11 @@ impl Model {
             bytemuck::cast_slice(model_mat.as_slice()),
         );
 
+        let view = frame.texture.create_view(&Default::default());
         let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: None,
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                view: &frame.texture.create_view(&Default::default()),
+                view: &view,
                 resolve_target: None,
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Load,

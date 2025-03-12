@@ -11,7 +11,7 @@ env_logger = "0.8.3"
 itertools = "0.10.0"
 nalgebra-glm = "0.13.0"
 pollster = "0.2.4"
-wgpu = "24.0"
+wgpu = { git = "https://github.com/wasi-gfx/wgpu.git", rev = "e4a3f80240e99954a6968edf07f884a62e277a74", default-features = false, features = ["wasi", "wgsl"]}
 winit = "0.30.9"
 gltf = "1.4.1"
 log = "0.4.26"
