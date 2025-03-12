@@ -4,14 +4,19 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-
 bytemuck = { version = "1.5.1", features = ["derive"] }
 clap = "2.33"
 env_logger = "0.8.3"
 itertools = "0.10.0"
 nalgebra-glm = "0.13.0"
 pollster = "0.2.4"
-wgpu = { git = "https://github.com/wasi-gfx/wgpu.git", rev = "e4a3f80240e99954a6968edf07f884a62e277a74", default-features = false, features = ["wasi", "wgsl"]}
-winit = "0.30.9"
 gltf = "1.4.1"
 log = "0.4.26"
+
+[target.'cfg(not(target_arch="wasm32"))'.dependencies]
+wgpu_native = { version = "0.19", package = "wgpu" }
+winit = { version = "0.30.9" }
+
+[target.'cfg(target_arch="wasm32")'.dependencies]
+wgpu_wasi = { git = "https://github.com/wasi-gfx/wgpu.git", rev = "ac7a4df0aace7120a2847abd87301f3cf9512877", default-features = false, features = ["wasi", "wgsl"], package = "wgpu" }
+wasi = { version = "=0.13.1+wasi-0.2.0" }

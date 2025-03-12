@@ -1,7 +1,7 @@
 use gltf::Gltf;
 use nalgebra_glm::Vec2;
 use std::sync::Arc;
-use winit::{
+use crate::winit::{
     event::{ElementState, Event, MouseScrollDelta, WindowEvent},
     event_loop::EventLoop,
     window::Window,
@@ -11,6 +11,15 @@ pub(crate) mod app;
 pub(crate) mod backdrop;
 pub(crate) mod camera;
 pub(crate) mod model;
+#[cfg(not(target_arch="wasm32"))]
+pub(crate) use winit;
+#[cfg(target_arch="wasm32")]
+pub(crate) mod winit;
+
+#[cfg(not(target_arch="wasm32"))]
+extern crate wgpu_native as wgpu;
+#[cfg(target_arch="wasm32")]
+extern crate wgpu_wasi as wgpu;
 
 use crate::app::App;
 
@@ -92,8 +101,23 @@ fn main() {
 
     let gltf = gltf::Gltf::from_slice(include_bytes!("../axis.glb")).unwrap();
 
-    let event_loop = EventLoop::new().unwrap();
+    let event_loop = EventLoop::<()>::new().unwrap();
+    #[cfg(not(target_arch="wasm32"))]
     let window = event_loop.create_window(Default::default()).unwrap();
+    #[cfg(target_arch="wasm32")]
+    let window = winit::window::WindowBuilder::new().build(&event_loop).unwrap();
     let window = Arc::new(window);
     pollster::block_on(run(event_loop, window, gltf));
 }
+
+#[cfg(target_arch="wasm32")]
+struct MyCliRunner;
+#[cfg(target_arch="wasm32")]
+impl ::wasi::exports::cli::run::Guest for MyCliRunner {
+    fn run() -> Result<(), ()> {
+        main();
+        Ok(())
+    }
+}
+#[cfg(target_arch="wasm32")]
+::wasi::cli::command::export!(MyCliRunner);

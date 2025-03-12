@@ -1,7 +1,7 @@
 use glm::{Mat4, Vec2, Vec3, Vec4};
 use itertools::Itertools;
 use nalgebra_glm as glm;
-use winit::event::MouseButton;
+use crate::winit::event::MouseButton;
 
 use crate::model::GPUVertex;
 

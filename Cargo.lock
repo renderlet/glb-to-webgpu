@@ -68,7 +68,7 @@ dependencies = [
  "log",
  "ndk",
  "ndk-context",
- "ndk-sys",
+ "ndk-sys 0.6.0+11769913",
  "num_enum",
  "thiserror",
 ]
@@ -452,6 +452,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96a6ac251f4a2aca6b3f91340350eab87ae57c3f127ffeb585e92bd336717991"
 
 [[package]]
+name = "d3d12"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e3d747f100290a1ca24b752186f61f6637e1deffe3bf6320de6fcb29510a307"
+dependencies = [
+ "bitflags 2.9.0",
+ "libloading 0.7.4",
+ "winapi",
+]
+
+[[package]]
 name = "dispatch"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -577,7 +588,7 @@ checksum = "c4567c8db10ae91089c99af84c68c38da3ec2f087c3f82960bcdbf3656b6f4d7"
 dependencies = [
  "cfg-if",
  "libc",
- "wasi",
+ "wasi 0.11.0+wasi-snapshot-preview1",
 ]
 
 [[package]]
@@ -603,7 +614,9 @@ dependencies = [
  "log",
  "nalgebra-glm",
  "pollster",
- "wgpu",
+ "wasi 0.13.1+wasi-0.2.0",
+ "wgpu 0.19.0",
+ "wgpu 0.19.4",
  "winit",
 ]
 
@@ -611,6 +624,18 @@ dependencies = [
 name = "glow"
 version = "0.13.0"
 source = "git+https://github.com/grovesNL/glow.git?rev=29ff917a2b2ff7ce0a81b2cc5681de6d4735b36e#29ff917a2b2ff7ce0a81b2cc5681de6d4735b36e"
+dependencies = [
+ "js-sys",
+ "slotmap",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "glow"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd348e04c43b32574f2de31c8bb397d96c9fcfa1371bd4ca6d8bdc464ab121b1"
 dependencies = [
  "js-sys",
  "slotmap",
@@ -1027,7 +1052,27 @@ dependencies = [
 [[package]]
 name = "naga"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=e4a3f80240e99954a6968edf07f884a62e277a74#e4a3f80240e99954a6968edf07f884a62e277a74"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ac7a4df0aace7120a2847abd87301f3cf9512877#ac7a4df0aace7120a2847abd87301f3cf9512877"
+dependencies = [
+ "bit-set",
+ "bitflags 2.9.0",
+ "codespan-reporting",
+ "hexf-parse",
+ "indexmap",
+ "log",
+ "num-traits",
+ "rustc-hash",
+ "spirv",
+ "termcolor",
+ "thiserror",
+ "unicode-xid",
+]
+
+[[package]]
+name = "naga"
+version = "0.19.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50e3524642f53d9af419ab5e8dd29d3ba155708267667c2f3f06c88c9e130843"
 dependencies = [
  "bit-set",
  "bitflags 2.9.0",
@@ -1079,9 +1124,9 @@ dependencies = [
  "bitflags 2.9.0",
  "jni-sys",
  "log",
- "ndk-sys",
+ "ndk-sys 0.6.0+11769913",
  "num_enum",
- "raw-window-handle",
+ "raw-window-handle 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
 ]
 
@@ -1090,6 +1135,15 @@ name = "ndk-context"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27b02d87554356db9e9a873add8782d4ea6e3e58ea071a9adb9a2e8ddb884a8b"
+
+[[package]]
+name = "ndk-sys"
+version = "0.5.0+25.2.9519653"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c196769dd60fd4f363e11d948139556a344e79d451aeb2fa2fd040738ef7691"
+dependencies = [
+ "jni-sys",
+]
 
 [[package]]
 name = "ndk-sys"
@@ -1554,10 +1608,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "range-alloc"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3d6831663a5098ea164f89cff59c6284e95f4e3c76ce9848d4529f5ccca9bde"
+
+[[package]]
 name = "raw-window-handle"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539"
+
+[[package]]
+name = "raw-window-handle"
+version = "0.6.2"
+source = "git+https://github.com/wasi-gfx/raw-window-handle.git?rev=498cb391869d6ecee601e525a354ca27e8a86130#498cb391869d6ecee601e525a354ca27e8a86130"
+
+[[package]]
+name = "raw-window-handle"
+version = "0.6.2"
+source = "git+https://github.com/wasi-gfx/raw-window-handle.git?rev=c14d47c8e5ea1ef9f776da481d8c4ee7e41f9832#c14d47c8e5ea1ef9f776da481d8c4ee7e41f9832"
 
 [[package]]
 name = "rawpointer"
@@ -2028,6 +2098,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 
 [[package]]
+name = "wasi"
+version = "0.13.1+wasi-0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f43d1c36145feb89a3e61aa0ba3e582d976a8ab77f1474aa0adb80800fe0cf8"
+dependencies = [
+ "wit-bindgen-rt",
+]
+
+[[package]]
 name = "wasm-bindgen"
 version = "0.2.100"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2265,7 +2344,7 @@ dependencies = [
 [[package]]
 name = "wgpu"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=e4a3f80240e99954a6968edf07f884a62e277a74#e4a3f80240e99954a6968edf07f884a62e277a74"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ac7a4df0aace7120a2847abd87301f3cf9512877#ac7a4df0aace7120a2847abd87301f3cf9512877"
 dependencies = [
  "arrayvec",
  "cfg-if",
@@ -2274,22 +2353,47 @@ dependencies = [
  "log",
  "parking_lot",
  "profiling",
- "raw-window-handle",
+ "raw-window-handle 0.6.2 (git+https://github.com/wasi-gfx/raw-window-handle.git?rev=c14d47c8e5ea1ef9f776da481d8c4ee7e41f9832)",
  "smallvec",
  "static_assertions",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
- "wgpu-core",
- "wgpu-hal",
- "wgpu-types",
+ "wgpu-core 0.19.0",
+ "wgpu-hal 0.19.0",
+ "wgpu-types 0.19.0",
  "wit-bindgen",
+]
+
+[[package]]
+name = "wgpu"
+version = "0.19.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cbd7311dbd2abcfebaabf1841a2824ed7c8be443a0f29166e5d3c6a53a762c01"
+dependencies = [
+ "arrayvec",
+ "cfg-if",
+ "cfg_aliases 0.1.1",
+ "js-sys",
+ "log",
+ "naga 0.19.2",
+ "parking_lot",
+ "profiling",
+ "raw-window-handle 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "smallvec",
+ "static_assertions",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "wgpu-core 0.19.4",
+ "wgpu-hal 0.19.5",
+ "wgpu-types 0.19.2",
 ]
 
 [[package]]
 name = "wgpu-core"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=e4a3f80240e99954a6968edf07f884a62e277a74#e4a3f80240e99954a6968edf07f884a62e277a74"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ac7a4df0aace7120a2847abd87301f3cf9512877#ac7a4df0aace7120a2847abd87301f3cf9512877"
 dependencies = [
  "arrayvec",
  "bit-vec",
@@ -2298,23 +2402,49 @@ dependencies = [
  "codespan-reporting",
  "indexmap",
  "log",
- "naga",
+ "naga 0.19.0",
  "once_cell",
  "parking_lot",
  "profiling",
- "raw-window-handle",
+ "raw-window-handle 0.6.2 (git+https://github.com/wasi-gfx/raw-window-handle.git?rev=498cb391869d6ecee601e525a354ca27e8a86130)",
  "rustc-hash",
  "smallvec",
  "thiserror",
  "web-sys",
- "wgpu-hal",
- "wgpu-types",
+ "wgpu-hal 0.19.0",
+ "wgpu-types 0.19.0",
+]
+
+[[package]]
+name = "wgpu-core"
+version = "0.19.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28b94525fc99ba9e5c9a9e24764f2bc29bad0911a7446c12f446a8277369bf3a"
+dependencies = [
+ "arrayvec",
+ "bit-vec",
+ "bitflags 2.9.0",
+ "cfg_aliases 0.1.1",
+ "codespan-reporting",
+ "indexmap",
+ "log",
+ "naga 0.19.2",
+ "once_cell",
+ "parking_lot",
+ "profiling",
+ "raw-window-handle 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rustc-hash",
+ "smallvec",
+ "thiserror",
+ "web-sys",
+ "wgpu-hal 0.19.5",
+ "wgpu-types 0.19.2",
 ]
 
 [[package]]
 name = "wgpu-hal"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=e4a3f80240e99954a6968edf07f884a62e277a74#e4a3f80240e99954a6968edf07f884a62e277a74"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ac7a4df0aace7120a2847abd87301f3cf9512877#ac7a4df0aace7120a2847abd87301f3cf9512877"
 dependencies = [
  "android_system_properties",
  "arrayvec",
@@ -2322,7 +2452,50 @@ dependencies = [
  "bitflags 2.9.0",
  "cfg_aliases 0.1.1",
  "core-graphics-types",
- "glow",
+ "glow 0.13.0",
+ "glutin_wgl_sys",
+ "gpu-alloc",
+ "gpu-allocator",
+ "gpu-descriptor",
+ "hassle-rs",
+ "js-sys",
+ "khronos-egl",
+ "libc",
+ "libloading 0.8.6",
+ "log",
+ "metal",
+ "naga 0.19.0",
+ "objc",
+ "once_cell",
+ "parking_lot",
+ "profiling",
+ "raw-window-handle 0.6.2 (git+https://github.com/wasi-gfx/raw-window-handle.git?rev=498cb391869d6ecee601e525a354ca27e8a86130)",
+ "renderdoc-sys",
+ "rustc-hash",
+ "smallvec",
+ "thiserror",
+ "wasm-bindgen",
+ "web-sys",
+ "wgpu-types 0.19.0",
+ "winapi",
+]
+
+[[package]]
+name = "wgpu-hal"
+version = "0.19.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bfabcfc55fd86611a855816326b2d54c3b2fd7972c27ce414291562650552703"
+dependencies = [
+ "android_system_properties",
+ "arrayvec",
+ "ash",
+ "bit-set",
+ "bitflags 2.9.0",
+ "block",
+ "cfg_aliases 0.1.1",
+ "core-graphics-types",
+ "d3d12",
+ "glow 0.13.1",
  "glutin_wgl_sys",
  "gpu-alloc",
  "gpu-allocator",
@@ -2334,28 +2507,41 @@ dependencies = [
  "libloading 0.7.4",
  "log",
  "metal",
- "naga",
+ "naga 0.19.2",
+ "ndk-sys 0.5.0+25.2.9519653",
  "objc",
  "once_cell",
  "parking_lot",
  "profiling",
- "raw-window-handle",
+ "range-alloc",
+ "raw-window-handle 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "renderdoc-sys",
  "rustc-hash",
  "smallvec",
  "thiserror",
  "wasm-bindgen",
  "web-sys",
- "wgpu-types",
+ "wgpu-types 0.19.2",
  "winapi",
 ]
 
 [[package]]
 name = "wgpu-types"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=e4a3f80240e99954a6968edf07f884a62e277a74#e4a3f80240e99954a6968edf07f884a62e277a74"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ac7a4df0aace7120a2847abd87301f3cf9512877#ac7a4df0aace7120a2847abd87301f3cf9512877"
 dependencies = [
  "bitflags 2.9.0",
+]
+
+[[package]]
+name = "wgpu-types"
+version = "0.19.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b671ff9fb03f78b46ff176494ee1ebe7d603393f42664be55b64dc8d53969805"
+dependencies = [
+ "bitflags 2.9.0",
+ "js-sys",
+ "web-sys",
 ]
 
 [[package]]
@@ -2649,7 +2835,7 @@ dependencies = [
  "orbclient",
  "percent-encoding",
  "pin-project",
- "raw-window-handle",
+ "raw-window-handle 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "redox_syscall 0.4.1",
  "rustix",
  "sctk-adwaita",
