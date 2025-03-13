@@ -1,8 +1,8 @@
-use gltf;
 use crate::winit::{
     dpi::PhysicalSize,
     event::{DeviceEvent, MouseScrollDelta},
 };
+use gltf;
 
 use crate::{backdrop::Backdrop, camera::Camera, model::Model};
 

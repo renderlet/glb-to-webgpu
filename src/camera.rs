@@ -1,7 +1,7 @@
+use crate::winit::event::MouseButton;
 use glm::{Mat4, Vec2, Vec3, Vec4};
 use itertools::Itertools;
 use nalgebra_glm as glm;
-use crate::winit::event::MouseButton;
 
 use crate::model::GPUVertex;
 
@@ -19,10 +19,10 @@ pub struct Camera {
     height: f32,
 
     /// Pitch as an Euler angle
-    pitch: f32,
+    pub pitch: f32,
 
     /// Yaw as an Euler angle
-    yaw: f32,
+    pub yaw: f32,
 
     /// Model scale
     scale: f32,
@@ -68,22 +68,22 @@ impl Camera {
         .map(|m| self.mouse = m);
     }
 
-    pub fn mat(&self) -> Mat4 {
+    fn mat(&self) -> Mat4 {
         self.view_matrix() * self.model_matrix()
     }
 
-    pub fn mat_i(&self) -> Mat4 {
+    fn mat_i(&self) -> Mat4 {
         (self.view_matrix() * self.model_matrix())
             .try_inverse()
             .expect("Failed to invert mouse matrix")
     }
 
     /// Converts a normalized mouse position into 3D
-    pub fn mouse_pos(&self, pos_norm: Vec2) -> Vec3 {
+    fn mouse_pos(&self, pos_norm: Vec2) -> Vec3 {
         (self.mat_i() * Vec4::new(pos_norm.x, pos_norm.y, 0.0, 1.0)).xyz()
     }
 
-    pub fn mouse_move(&mut self, new_pos: Vec2) {
+    fn mouse_move(&mut self, new_pos: Vec2) {
         let x_norm = 2.0 * (new_pos.x / self.width - 0.5);
         let y_norm = -2.0 * (new_pos.y / self.height - 0.5);
         let new_pos = Vec2::new(x_norm, y_norm);
@@ -179,12 +179,12 @@ impl Camera {
         glm::scale(&i, &Vec3::new(1.0, self.width / self.height, 0.1))
     }
 
-    pub fn spin(&mut self, dx: f32, dy: f32) {
+    fn spin(&mut self, dx: f32, dy: f32) {
         self.pitch += dx;
         self.yaw += dy;
     }
 
-    pub fn scale(&mut self, value: f32, pos: Vec2) {
+    fn scale(&mut self, value: f32, pos: Vec2) {
         let start_pos = self.mouse_pos(pos);
         self.scale *= value;
         let end_pos = self.mouse_pos(pos);

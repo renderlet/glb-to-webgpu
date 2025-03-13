@@ -1,0 +1,5 @@
+package example:example;
+
+world example {
+    include renderlet:plugin-runtime/imports;
+}

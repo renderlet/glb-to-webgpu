@@ -1,0 +1,4 @@
+webgpu = "https://github.com/WebAssembly/wasi-webgpu/archive/2d44a4c5eb93aba5ed468593410a338390f2469c.tar.gz"
+io = "https://github.com/WebAssembly/wasi-io/archive/fef02cddb4ac28dcde97bf11a4c7b856833a948f.tar.gz"
+# plugin-runtime = "https://github.com/renderlet/plugin-runtime/archive/518800eb72400fba3e51d3908b8ef71a40f83701.tar.gz"
+plugin-runtime = "https://codeload.github.com/renderlet/plugin-runtime/tar.gz/518800eb72400fba3e51d3908b8ef71a40f83701?token=AC7U6RFCZTD2LSB4DPXNBRTH2M2WS"

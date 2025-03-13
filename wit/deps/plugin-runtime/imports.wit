@@ -1,0 +1,39 @@
+package renderlet:plugin-runtime;
+
+interface camera-position {
+    use wasi:io/poll@0.2.0.{pollable};
+    use wasi:webgpu/surface.{surface};
+
+    record camera {
+        orientation: quaternion,
+        position: vec3,
+    }
+
+    record vec3 {
+        x: f32,
+        y: f32,
+        z: f32,
+    }
+
+    record quaternion {
+        x: f32,
+        y: f32,
+        z: f32,
+        w: f32,
+    }
+
+    on-camera-position-change-subscribe: func(surface: borrow<surface>) -> pollable;
+    on-camera-position-change-get: func(surface: borrow<surface>) -> option<camera>;
+}
+
+world imports {
+    import camera-position;
+
+    // include wasi:webgpu/imports;
+
+    // /// main entrypoint
+    // export start: func();
+
+    // /// print to stdout
+    // import print: func(s: string);
+}

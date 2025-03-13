@@ -4,14 +4,13 @@ pub mod window {
         surface::{CreateDesc, Surface},
     };
 
-
     use wgpu::rwh::{HasDisplayHandle, HasWindowHandle};
 
     use super::{dpi::PhysicalSize, event_loop::EventLoopWindowTarget};
 
     #[derive(Debug)]
     pub struct Window {
-        surface: Surface,
+        pub(crate) surface: Surface,
         graphics_context: Context,
     }
     impl HasWindowHandle for Window {

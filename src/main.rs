@@ -1,25 +1,36 @@
-use gltf::Gltf;
-use nalgebra_glm::Vec2;
-use std::sync::Arc;
 use crate::winit::{
     event::{ElementState, Event, MouseScrollDelta, WindowEvent},
     event_loop::EventLoop,
     window::Window,
 };
+use gltf::Gltf;
+use nalgebra_glm::Vec2;
+use std::sync::Arc;
 
 pub(crate) mod app;
 pub(crate) mod backdrop;
 pub(crate) mod camera;
 pub(crate) mod model;
-#[cfg(not(target_arch="wasm32"))]
+#[cfg(not(target_arch = "wasm32"))]
 pub(crate) use winit;
-#[cfg(target_arch="wasm32")]
+#[cfg(target_arch = "wasm32")]
 pub(crate) mod winit;
 
-#[cfg(not(target_arch="wasm32"))]
+#[cfg(not(target_arch = "wasm32"))]
 extern crate wgpu_native as wgpu;
-#[cfg(target_arch="wasm32")]
+#[cfg(target_arch = "wasm32")]
 extern crate wgpu_wasi as wgpu;
+
+pub mod my {
+    wit_bindgen::generate!({
+        path: "wit",
+        world: "example:example/example",
+        with: {
+            "wasi:io/poll@0.2.0": ::wasi::io::poll,
+            "wasi:webgpu/surface": wgpu::backend::wasi_webgpu::wasi::webgpu::surface,
+        },
+    });
+}
 
 use crate::app::App;
 
@@ -55,43 +66,53 @@ async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
 
     let mut app = App::new(size, adapter, surface, device, gltf);
 
-    event_loop
-        .run(move |event, event_loop| match event {
-            Event::WindowEvent { event, .. } => match event {
-                WindowEvent::CloseRequested => {
-                    event_loop.exit();
-                }
-                WindowEvent::RedrawRequested => {
-                    app.redraw(&queue);
-                }
-                WindowEvent::Resized(size) => {
-                    app.resize(size);
-                    window.request_redraw();
-                }
-                WindowEvent::MouseInput { button, state, .. } => {
-                    match state {
-                        ElementState::Pressed => app.camera.mouse_pressed(button),
-                        ElementState::Released => app.camera.mouse_released(button),
-                    }
-                    window.request_redraw();
-                }
-                WindowEvent::CursorMoved { position, .. } => {
-                    app.camera
-                        .mouse_move(Vec2::new(position.x as f32, position.y as f32));
-                    window.request_redraw();
-                }
-                WindowEvent::MouseWheel { delta, .. } => {
-                    if let MouseScrollDelta::LineDelta(_, verti) = delta {
-                        app.camera.mouse_scroll(verti * 10.0);
-                    }
-                    window.request_redraw();
-                }
-                _ => {}
-            },
-            Event::DeviceEvent { event, .. } => app.device_event(event),
-            _ => (),
-        })
-        .unwrap();
+    use crate::my::renderlet::plugin_runtime::camera_position;
+    loop {
+        camera_position::on_camera_position_change_subscribe(&window.surface).block();
+        let event = camera_position::on_camera_position_change_get(&window.surface).unwrap();
+        let euler_angles = quaternion_to_euler_angles(event.orientation);
+        app.camera.yaw = euler_angles.yaw;
+        app.camera.pitch = euler_angles.pitch;
+        app.redraw(&queue);
+    }
+
+    // event_loop
+    //     .run(move |event, event_loop| match event {
+    //         Event::WindowEvent { event, .. } => match event {
+    //             WindowEvent::CloseRequested => {
+    //                 event_loop.exit();
+    //             }
+    //             WindowEvent::RedrawRequested => {
+    //                 app.redraw(&queue);
+    //             }
+    //             WindowEvent::Resized(size) => {
+    //                 app.resize(size);
+    //                 window.request_redraw();
+    //             }
+    //             WindowEvent::MouseInput { button, state, .. } => {
+    //                 match state {
+    //                     ElementState::Pressed => app.camera.mouse_pressed(button),
+    //                     ElementState::Released => app.camera.mouse_released(button),
+    //                 }
+    //                 window.request_redraw();
+    //             }
+    //             WindowEvent::CursorMoved { position, .. } => {
+    //                 app.camera
+    //                     .mouse_move(Vec2::new(position.x as f32, position.y as f32));
+    //                 window.request_redraw();
+    //             }
+    //             WindowEvent::MouseWheel { delta, .. } => {
+    //                 if let MouseScrollDelta::LineDelta(_, verti) = delta {
+    //                     app.camera.mouse_scroll(verti * 10.0);
+    //                 }
+    //                 window.request_redraw();
+    //             }
+    //             _ => {}
+    //         },
+    //         Event::DeviceEvent { event, .. } => app.device_event(event),
+    //         _ => (),
+    //     })
+    //     .unwrap();
 }
 
 fn main() {
@@ -102,22 +123,46 @@ fn main() {
     let gltf = gltf::Gltf::from_slice(include_bytes!("../axis.glb")).unwrap();
 
     let event_loop = EventLoop::<()>::new().unwrap();
-    #[cfg(not(target_arch="wasm32"))]
+    #[cfg(not(target_arch = "wasm32"))]
     let window = event_loop.create_window(Default::default()).unwrap();
-    #[cfg(target_arch="wasm32")]
-    let window = winit::window::WindowBuilder::new().build(&event_loop).unwrap();
+    #[cfg(target_arch = "wasm32")]
+    let window = winit::window::WindowBuilder::new()
+        .build(&event_loop)
+        .unwrap();
     let window = Arc::new(window);
     pollster::block_on(run(event_loop, window, gltf));
 }
 
-#[cfg(target_arch="wasm32")]
+#[cfg(target_arch = "wasm32")]
 struct MyCliRunner;
-#[cfg(target_arch="wasm32")]
+#[cfg(target_arch = "wasm32")]
 impl ::wasi::exports::cli::run::Guest for MyCliRunner {
     fn run() -> Result<(), ()> {
         main();
         Ok(())
     }
 }
-#[cfg(target_arch="wasm32")]
+#[cfg(target_arch = "wasm32")]
 ::wasi::cli::command::export!(MyCliRunner);
+
+#[derive(Clone, Copy, Debug)]
+struct EulerAngles {
+    yaw: f32,
+    pitch: f32,
+    roll: f32,
+}
+fn quaternion_to_euler_angles(
+    q: my::renderlet::plugin_runtime::camera_position::Quaternion,
+) -> EulerAngles {
+    EulerAngles {
+        yaw: f32::atan2(
+            2.0 * (q.y * q.z + q.w * q.x),
+            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z,
+        ),
+        pitch: f32::asin(-2.0 * (q.x * q.z - q.w * q.y)),
+        roll: f32::atan2(
+            2.0 * (q.x * q.y + q.w * q.z),
+            q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
+        ),
+    }
+}

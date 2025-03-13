@@ -1,0 +1,15 @@
+[io]
+url = "https://github.com/WebAssembly/wasi-io/archive/fef02cddb4ac28dcde97bf11a4c7b856833a948f.tar.gz"
+sha256 = "7210e5653539a15478f894d4da24cc69d61924cbcba21d2804d69314a88e5a4c"
+sha512 = "49184a1b0945a889abd52d25271172ed3dc2db6968fcdddb1bab7ee0081f4a3eeee0977ad2291126a37631c0d86eeea75d822fa8af224c422134500bf9f0f2bb"
+
+[plugin-runtime]
+url = "https://codeload.github.com/renderlet/plugin-runtime/tar.gz/518800eb72400fba3e51d3908b8ef71a40f83701?token=AC7U6RFCZTD2LSB4DPXNBRTH2M2WS"
+sha256 = "ee96c34f3d3941bddcebdd0a6664167721a552ed55c5494f4a3609142256f5cc"
+sha512 = "c613c78fe6547c2805ff3b8bdd2fef8aa3e6d1700a45895513a359fac58bab33950ddaa75c3c07fbf89df7e127ded0a7889113fd6001bc86237d54ea8e387a37"
+
+[webgpu]
+url = "https://github.com/WebAssembly/wasi-webgpu/archive/2d44a4c5eb93aba5ed468593410a338390f2469c.tar.gz"
+sha256 = "51a512d0d736af4c06242067c2e0ff82d688cbcf86048b71db387465d1166b37"
+sha512 = "d37efd57e25c7f35cca11a92b2348d13ee5c4c055bec226b4317332c3191ebd2938e16bd59db526518eb0bf9eff1911338275cdf52888664a4c1688842f14106"
+deps = ["io"]
