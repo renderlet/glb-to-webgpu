@@ -107,7 +107,7 @@ impl<'a> App<'a> {
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
-        self.backdrop.draw(&frame, &self.depth.1, &mut encoder);
+        // self.backdrop.draw(&frame, &self.depth.1, &mut encoder);
         self.model
             .draw(&self.camera, &queue, &frame, &self.depth.1, &mut encoder);
         queue.submit(Some(encoder.finish()));
