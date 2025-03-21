@@ -98,10 +98,11 @@ impl<'a> App<'a> {
     }
 
     pub fn redraw(&mut self, queue: &wgpu::Queue) {
-        let frame = self
-            .surface
-            .get_current_texture()
-            .expect("Failed to acquire next swap chain texture");
+        // let frame = self
+        //     .surface
+        //     .get_current_texture()
+        //     .expect("Failed to acquire next swap chain texture");
+        let frame = self.get_current_texture();
 
         let mut encoder = self
             .device
@@ -111,6 +112,28 @@ impl<'a> App<'a> {
         self.model
             .draw(&self.camera, &queue, &frame, &self.depth.1, &mut encoder);
         queue.submit(Some(encoder.finish()));
-        frame.present();
+
+        use crate::my::renderlet::plugin_runtime::camera_position;
+        let frame: &camera_position::GpuTexture = frame.data.downcast_ref().unwrap();
+        camera_position::present_transparent(frame);
+    }
+
+    fn get_current_texture(&self) -> wgpu::Texture {
+        self.device.create_texture(
+            &wgpu::TextureDescriptor {
+                label: None,
+                size: wgpu::Extent3d {
+                    width: 200,
+                    height: 200,
+                    depth_or_array_layers: 1,
+                },
+                mip_level_count: 1,
+                sample_count: 1,
+                dimension: wgpu::TextureDimension::D2,
+                format: wgpu::TextureFormat::Rgba8Unorm, // TODO: take preferred canvas format //
+                usage: wgpu::TextureUsages::COPY_SRC
+                    | wgpu::TextureUsages::RENDER_ATTACHMENT,
+                view_formats: &vec![],
+            })
     }
 }

@@ -204,7 +204,8 @@ impl Model {
         &self,
         camera: &Camera,
         queue: &wgpu::Queue,
-        frame: &wgpu::SurfaceTexture,
+        // frame: &wgpu::SurfaceTexture,
+        frame: &wgpu::Texture,
         depth_view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
     ) {
@@ -222,7 +223,7 @@ impl Model {
             bytemuck::cast_slice(model_mat.as_slice()),
         );
 
-        let view = frame.texture.create_view(&Default::default());
+        let view = frame.create_view(&Default::default());
         let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: None,
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {

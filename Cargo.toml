@@ -18,6 +18,6 @@ wgpu_native = { version = "0.19", package = "wgpu" }
 winit = { version = "0.30.9" }
 
 [target.'cfg(target_arch="wasm32")'.dependencies]
-wgpu_wasi = { git = "https://github.com/wasi-gfx/wgpu.git", rev = "ac7a4df0aace7120a2847abd87301f3cf9512877", default-features = false, features = ["wasi", "wgsl"], package = "wgpu" }
+wgpu_wasi = { git = "https://github.com/wasi-gfx/wgpu.git", rev = "ccfd820d2f095ca472ea8c3ab78558a606cc4cb5", default-features = false, features = ["wasi", "wgsl"], package = "wgpu" }
 wasi = { version = "=0.13.1+wasi-0.2.0" }
 wit-bindgen = "0.26"

@@ -3,6 +3,7 @@ package renderlet:plugin-runtime;
 interface camera-position {
     use wasi:io/poll@0.2.0.{pollable};
     use wasi:webgpu/surface.{surface};
+    use wasi:webgpu/webgpu.{gpu-texture};
 
     record camera {
         orientation: quaternion,
@@ -24,6 +25,10 @@ interface camera-position {
 
     on-camera-position-change-subscribe: func(surface: borrow<surface>) -> pollable;
     on-camera-position-change-get: func(surface: borrow<surface>) -> option<camera>;
+
+    set-camera-position: func(camera: camera);
+
+    present-transparent: func(texture: borrow<gpu-texture>);
 }
 
 world imports {

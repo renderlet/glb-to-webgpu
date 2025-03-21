@@ -26,8 +26,10 @@ pub mod my {
         path: "wit",
         world: "example:example/example",
         with: {
-            "wasi:io/poll@0.2.0": ::wasi::io::poll,
+            // "wasi:io/poll@0.2.0": ::wasi::io::poll,
+            "wasi:io/poll@0.2.0": wgpu::backend::wasi_webgpu::wasi::io::poll,
             "wasi:webgpu/surface": wgpu::backend::wasi_webgpu::wasi::webgpu::surface,
+            "wasi:webgpu/webgpu": wgpu::backend::wasi_webgpu::wasi::webgpu::webgpu,
         },
     });
 }
@@ -65,15 +67,84 @@ async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
     );
 
     let mut app = App::new(size, adapter, surface, device, gltf);
-
     use crate::my::renderlet::plugin_runtime::camera_position;
+    let ccc: Option<camera_position::Camera> = None;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    let pointer_up_pollable = window.surface.subscribe_pointer_up();
+    let pointer_down_pollable = window.surface.subscribe_pointer_down();
+    let pointer_move_pollable = window.surface.subscribe_pointer_move();
+    let key_up_pollable = window.surface.subscribe_key_up();
+    let key_down_pollable = window.surface.subscribe_key_down();
+    let resize_pollable = window.surface.subscribe_resize();
+    let frame_pollable = window.surface.subscribe_frame();
+    let camera_pollable = camera_position::on_camera_position_change_subscribe(&window.surface);
+    let pollables = vec![
+        &pointer_up_pollable,
+        &pointer_down_pollable,
+        &pointer_move_pollable,
+        &key_up_pollable,
+        &key_down_pollable,
+        &resize_pollable,
+        &frame_pollable,
+        &camera_pollable,
+    ];
+    let mut green = false;
     loop {
-        camera_position::on_camera_position_change_subscribe(&window.surface).block();
-        let event = camera_position::on_camera_position_change_get(&window.surface).unwrap();
-        let euler_angles = quaternion_to_euler_angles(event.orientation);
-        app.camera.yaw = euler_angles.yaw;
-        app.camera.pitch = euler_angles.pitch;
-        app.redraw(&queue);
+        let pollables_res = wgpu::backend::wasi_webgpu::wasi::io::poll::poll(&pollables[..]);
+
+        // print("loop");
+
+        if pollables_res.contains(&0) {
+            let event = window.surface.get_pointer_up();
+            print(&format!("pointer_up: {:?}", event));
+            green = !green;
+        }
+        if pollables_res.contains(&1) {
+            let event = window.surface.get_pointer_down();
+            print(&format!("pointer_down: {:?}", event));
+        }
+        if pollables_res.contains(&2) {
+            let event = window.surface.get_pointer_move();
+            print(&format!("pointer_move: {:?}", event));
+        }
+        if pollables_res.contains(&3) {
+            let event = window.surface.get_key_up();
+            print(&format!("key_up: {:?}", event));
+        }
+        if pollables_res.contains(&4) {
+            let event = window.surface.get_key_down();
+            print(&format!("key_down: {:?}", event));
+        }
+        if pollables_res.contains(&5) {
+            let event = window.surface.get_resize();
+            print(&format!("resize: {:?}", event));
+        }
+        if pollables_res.contains(&6) {
+            let event = window.surface.get_frame();
+            // print(&format!("frame: {:?}", event));
+        }
+        if pollables_res.contains(&7) {
+            let event = camera_position::on_camera_position_change_get(&window.surface).unwrap();
+            print(&format!("camera: {:?}", event));
+            let euler_angles = quaternion_to_euler_angles(event.orientation);
+            app.camera.yaw = euler_angles.yaw;
+            app.camera.pitch = euler_angles.pitch;
+            app.redraw(&queue);
+        }
     }
 
     // event_loop
@@ -165,4 +236,10 @@ fn quaternion_to_euler_angles(
             q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
         ),
     }
+}
+
+fn print(s: &str) {
+    let stdout = wasi::cli::stdout::get_stdout();
+    stdout.blocking_write_and_flush(s.as_bytes()).unwrap();
+    stdout.blocking_write_and_flush(b"\n").unwrap();
 }
