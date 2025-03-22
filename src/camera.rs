@@ -139,7 +139,7 @@ impl Camera {
         let dx = xb.1 - xb.0;
         let dy = yb.1 - yb.0;
         let dz = zb.1 - zb.0;
-        self.scale = (1.0 / dx.max(dy).max(dz)) as f32;
+        self.scale = (0.8/ dx.max(dy).max(dz)) as f32;
         self.center = Vec3::new(
             (xb.0 + xb.1) as f32 / 2.0,
             (yb.0 + yb.1) as f32 / 2.0,
@@ -156,6 +156,13 @@ impl Camera {
         let i = Mat4::identity();
         // The transforms below are applied bottom-to-top when thinking about
         // the model, i.e. it's translated, then scaled, then rotated, etc.
+
+        let mut lh_to_rh = Mat4::identity();
+        lh_to_rh.m22 = -1.0;
+        lh_to_rh.m33 = -1.0;
+
+        // Convert from left handed to right handed rotations
+        lh_to_rh *
 
         // Scale to compensate for model size
         glm::scale(&i, &Vec3::new(self.scale, self.scale, self.scale)) *
