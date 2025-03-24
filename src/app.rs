@@ -114,8 +114,9 @@ impl<'a> App<'a> {
         queue.submit(Some(encoder.finish()));
 
         use crate::my::renderlet::plugin_runtime::camera_position;
-        let frame: &camera_position::GpuTexture = frame.data.downcast_ref().unwrap();
-        camera_position::present_transparent(frame);
+        let inner_texture: &camera_position::GpuTexture = frame.data.downcast_ref().unwrap();
+        camera_position::present_transparent(inner_texture);
+        Box::leak(Box::new(frame));
     }
 
     fn get_current_texture(&self) -> wgpu::Texture {
