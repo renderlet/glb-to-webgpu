@@ -4,7 +4,8 @@ use crate::winit::{
     window::Window,
 };
 use gltf::Gltf;
-use nalgebra_glm::{quat, quat_euler_angles};
+use nalgebra_glm::{quat, quat_euler_angles, Vec2};
+use my::renderlet::plugin_runtime::camera_position::{Camera, Quaternion, Vec3};
 use std::sync::Arc;
 
 pub(crate) mod app;
@@ -35,6 +36,8 @@ pub mod my {
 }
 
 use crate::app::App;
+
+use wgpu::backend::wasi_webgpu::wasi::webgpu::surface::PointerEvent;
 
 async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
     let size = window.inner_size();
@@ -103,6 +106,10 @@ async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
         &camera_pollable,
     ];
     let mut green = false;
+    // let mut point_down = false;
+    let mut global_camera: Option<Camera> = None;
+    let mut pointer_pos: Option<PointerEvent> = None;
+    let mut i = 0;
     loop {
         let pollables_res = wgpu::backend::wasi_webgpu::wasi::io::poll::poll(&pollables[..]);
 
@@ -111,15 +118,50 @@ async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
         if pollables_res.contains(&0) {
             let event = window.surface.get_pointer_up();
             print(&format!("pointer_up: {:?}", event));
+            pointer_pos = None;
             green = !green;
         }
         if pollables_res.contains(&1) {
             let event = window.surface.get_pointer_down();
+            if let Some(event) = event {
+                pointer_pos = Some(event);
+            }
+
             print(&format!("pointer_down: {:?}", event));
         }
         if pollables_res.contains(&2) {
-            let event = window.surface.get_pointer_move();
-            print(&format!("pointer_move: {:?}", event));
+            let new_pointer_pos = window.surface.get_pointer_move();
+            i+= 1;
+            // skip every second event
+            if i % 2 == 0 {
+                continue;
+            }
+            if let Some(new_pointer_pos) = new_pointer_pos {
+                if let Some(old_pointer_pos) = pointer_pos {
+                    let dx = old_pointer_pos.x - new_pointer_pos.x;
+                    let dy = old_pointer_pos.y - new_pointer_pos.y;
+                    pointer_pos = Some(new_pointer_pos);
+
+                    if let Some(camera) = global_camera {
+                        let new_camera = Camera {
+                            orientation: Quaternion {
+                                x: camera.orientation.x,
+                                y: camera.orientation.y,
+                                z: camera.orientation.z,
+                                w: camera.orientation.w,
+                            },
+                            position: Vec3 {
+                                x: camera.position.x + (0.1 * dx as f32),
+                                y: camera.position.y + (0.1 * dy as f32),
+                                z: camera.position.z,
+                            },
+                        };
+                        global_camera = Some(new_camera);
+                        camera_position::set_camera_position(new_camera);
+                    }
+                }
+            }
+            print(&format!("pointer_move: {:?}", new_pointer_pos));
         }
         if pollables_res.contains(&3) {
             let event = window.surface.get_key_up();
@@ -140,6 +182,7 @@ async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
         }
         if pollables_res.contains(&7) {
             let event = camera_position::on_camera_position_change_get(&window.surface).unwrap();
+            global_camera = Some(event);
             print(&format!("camera: {:?}", event));
             app.camera.quat = quat(event.orientation.x, event.orientation.y, event.orientation.z, event.orientation.w);
         }
