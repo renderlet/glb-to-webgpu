@@ -3,6 +3,7 @@ use crate::winit::{
     event::{DeviceEvent, MouseScrollDelta},
 };
 use gltf;
+use wgpu::Extent3d;
 
 use crate::{backdrop::Backdrop, camera::Camera, model::Model};
 
@@ -94,7 +95,8 @@ impl<'a> App<'a> {
         //     .surface
         //     .get_current_texture()
         //     .expect("Failed to acquire next swap chain texture");
-        let frame = self.get_current_texture();
+        let frame = self.get_current_texture(wgpu::TextureUsages::COPY_SRC | wgpu::TextureUsages::RENDER_ATTACHMENT);
+        let new_texture = self.get_current_texture(wgpu::TextureUsages::COPY_DST);
 
         let mut encoder = self
             .device
@@ -103,18 +105,29 @@ impl<'a> App<'a> {
         // self.backdrop.draw(&frame, &self.depth.1, &mut encoder);
         self.model
             .draw(&self.camera, &queue, &frame, &self.depth.1, &mut encoder);
+
+        encoder.copy_texture_to_texture(
+            frame.as_image_copy(),
+            new_texture.as_image_copy(),
+            Extent3d {
+                width: 200,
+                height: 200,
+                depth_or_array_layers: 1,
+            }
+        );
+
         queue.submit(Some(encoder.finish()));
 
-        //frame.present();
+        // frame.present();
 
-        
         use crate::my::renderlet::plugin_runtime::camera_position;
-        let inner_texture: &camera_position::GpuTexture = frame.data.downcast_ref().unwrap();
+        let inner_texture: &camera_position::GpuTexture = new_texture.data.downcast_ref().unwrap();
         camera_position::present_transparent(inner_texture);
         Box::leak(Box::new(frame));
+        Box::leak(Box::new(new_texture));
     }
 
-    fn get_current_texture(&self) -> wgpu::Texture {
+    fn get_current_texture(&self, usage: wgpu::TextureUsages) -> wgpu::Texture {
         self.device.create_texture(
             &wgpu::TextureDescriptor {
                 label: None,
@@ -127,8 +140,7 @@ impl<'a> App<'a> {
                 sample_count: 1,
                 dimension: wgpu::TextureDimension::D2,
                 format: wgpu::TextureFormat::Rgba8Unorm, // TODO: take preferred canvas format //
-                usage: wgpu::TextureUsages::COPY_SRC
-                    | wgpu::TextureUsages::RENDER_ATTACHMENT,
+                usage,
                 view_formats: &vec![],
             })
     }

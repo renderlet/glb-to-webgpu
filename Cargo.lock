@@ -1059,7 +1059,7 @@ dependencies = [
 [[package]]
 name = "naga"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ccfd820d2f095ca472ea8c3ab78558a606cc4cb5#ccfd820d2f095ca472ea8c3ab78558a606cc4cb5"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=97a0972c76dee72151976cce9c282314aa4f5d78#97a0972c76dee72151976cce9c282314aa4f5d78"
 dependencies = [
  "bit-set",
  "bitflags 2.9.0",
@@ -2389,7 +2389,7 @@ dependencies = [
 [[package]]
 name = "wgpu"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ccfd820d2f095ca472ea8c3ab78558a606cc4cb5#ccfd820d2f095ca472ea8c3ab78558a606cc4cb5"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=97a0972c76dee72151976cce9c282314aa4f5d78#97a0972c76dee72151976cce9c282314aa4f5d78"
 dependencies = [
  "arrayvec",
  "cfg-if",
@@ -2438,7 +2438,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ccfd820d2f095ca472ea8c3ab78558a606cc4cb5#ccfd820d2f095ca472ea8c3ab78558a606cc4cb5"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=97a0972c76dee72151976cce9c282314aa4f5d78#97a0972c76dee72151976cce9c282314aa4f5d78"
 dependencies = [
  "arrayvec",
  "bit-vec",
@@ -2489,7 +2489,7 @@ dependencies = [
 [[package]]
 name = "wgpu-hal"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ccfd820d2f095ca472ea8c3ab78558a606cc4cb5#ccfd820d2f095ca472ea8c3ab78558a606cc4cb5"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=97a0972c76dee72151976cce9c282314aa4f5d78#97a0972c76dee72151976cce9c282314aa4f5d78"
 dependencies = [
  "android_system_properties",
  "arrayvec",
@@ -2573,7 +2573,7 @@ dependencies = [
 [[package]]
 name = "wgpu-types"
 version = "0.19.0"
-source = "git+https://github.com/wasi-gfx/wgpu.git?rev=ccfd820d2f095ca472ea8c3ab78558a606cc4cb5#ccfd820d2f095ca472ea8c3ab78558a606cc4cb5"
+source = "git+https://github.com/wasi-gfx/wgpu.git?rev=97a0972c76dee72151976cce9c282314aa4f5d78#97a0972c76dee72151976cce9c282314aa4f5d78"
 dependencies = [
  "bitflags 2.9.0",
 ]
