@@ -48,14 +48,6 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn device_event(&mut self, e: DeviceEvent) {
-        if let DeviceEvent::MouseWheel { delta } = e {
-            if let MouseScrollDelta::PixelDelta(p) = delta {
-                self.camera.mouse_scroll(p.y as f32);
-            }
-        }
-    }
-
     pub fn resize(&mut self, size: PhysicalSize<u32>) {
         self.size = size;
         self.surface.configure(
@@ -113,9 +105,13 @@ impl<'a> App<'a> {
             .draw(&self.camera, &queue, &frame, &self.depth.1, &mut encoder);
         queue.submit(Some(encoder.finish()));
 
+        //frame.present();
+
+        
         use crate::my::renderlet::plugin_runtime::camera_position;
-        let frame: &camera_position::GpuTexture = frame.data.downcast_ref().unwrap();
-        camera_position::present_transparent(frame);
+        let inner_texture: &camera_position::GpuTexture = frame.data.downcast_ref().unwrap();
+        camera_position::present_transparent(inner_texture);
+        Box::leak(Box::new(frame));
     }
 
     fn get_current_texture(&self) -> wgpu::Texture {

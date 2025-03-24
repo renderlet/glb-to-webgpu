@@ -4,7 +4,7 @@ use crate::winit::{
     window::Window,
 };
 use gltf::Gltf;
-use nalgebra_glm::Vec2;
+use nalgebra_glm::{quat, quat_euler_angles};
 use std::sync::Arc;
 
 pub(crate) mod app;
@@ -136,14 +136,12 @@ async fn run(event_loop: EventLoop<()>, window: Arc<Window>, gltf: Gltf) {
         if pollables_res.contains(&6) {
             let event = window.surface.get_frame();
             // print(&format!("frame: {:?}", event));
+            app.redraw(&queue);
         }
         if pollables_res.contains(&7) {
             let event = camera_position::on_camera_position_change_get(&window.surface).unwrap();
             print(&format!("camera: {:?}", event));
-            let euler_angles = quaternion_to_euler_angles(event.orientation);
-            app.camera.yaw = euler_angles.yaw;
-            app.camera.pitch = euler_angles.pitch;
-            app.redraw(&queue);
+            app.camera.quat = quat(event.orientation.x, event.orientation.y, event.orientation.z, event.orientation.w);
         }
     }
 
@@ -216,27 +214,6 @@ impl ::wasi::exports::cli::run::Guest for MyCliRunner {
 #[cfg(target_arch = "wasm32")]
 ::wasi::cli::command::export!(MyCliRunner);
 
-#[derive(Clone, Copy, Debug)]
-struct EulerAngles {
-    yaw: f32,
-    pitch: f32,
-    roll: f32,
-}
-fn quaternion_to_euler_angles(
-    q: my::renderlet::plugin_runtime::camera_position::Quaternion,
-) -> EulerAngles {
-    EulerAngles {
-        yaw: f32::atan2(
-            2.0 * (q.y * q.z + q.w * q.x),
-            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z,
-        ),
-        pitch: f32::asin(-2.0 * (q.x * q.z - q.w * q.y)),
-        roll: f32::atan2(
-            2.0 * (q.x * q.y + q.w * q.z),
-            q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
-        ),
-    }
-}
 
 fn print(s: &str) {
     let stdout = wasi::cli::stdout::get_stdout();

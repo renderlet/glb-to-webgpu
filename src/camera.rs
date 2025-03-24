@@ -1,7 +1,7 @@
 use crate::winit::event::MouseButton;
-use glm::{Mat4, Vec2, Vec3, Vec4};
+use glm::{Quat, Mat4, Vec2, Vec3, Vec4};
 use itertools::Itertools;
-use nalgebra_glm as glm;
+use nalgebra_glm::{self as glm, quat_to_mat4};
 
 use crate::model::GPUVertex;
 
@@ -18,12 +18,6 @@ pub struct Camera {
     width: f32,
     height: f32,
 
-    /// Pitch as an Euler angle
-    pub pitch: f32,
-
-    /// Yaw as an Euler angle
-    pub yaw: f32,
-
     /// Model scale
     scale: f32,
 
@@ -31,6 +25,8 @@ pub struct Camera {
     center: Vec3,
 
     mouse: MouseState,
+
+    pub quat: Quat
 }
 
 impl Camera {
@@ -38,34 +34,11 @@ impl Camera {
         Camera {
             width,
             height,
-            pitch: 0.0,
-            yaw: 0.0,
+            quat: Default::default(),
             scale: 1.0,
             center: Vec3::zeros(),
             mouse: MouseState::Unknown,
         }
-    }
-
-    pub fn mouse_pressed(&mut self, button: MouseButton) {
-        // If we were previously free, then switch to panning or rotating
-        if let MouseState::Free(pos) = &self.mouse {
-            match button {
-                MouseButton::Left => Some(MouseState::Rotate(*pos)),
-                MouseButton::Right => Some(MouseState::Pan(*pos, self.mouse_pos(*pos))),
-                _ => None,
-            }
-            .map(|m| self.mouse = m);
-        }
-    }
-    pub fn mouse_released(&mut self, button: MouseButton) {
-        match &self.mouse {
-            MouseState::Rotate(pos) if button == MouseButton::Left => Some(MouseState::Free(*pos)),
-            MouseState::Pan(pos, ..) if button == MouseButton::Right => {
-                Some(MouseState::Free(*pos))
-            }
-            _ => None,
-        }
-        .map(|m| self.mouse = m);
     }
 
     fn mat(&self) -> Mat4 {
@@ -76,45 +49,6 @@ impl Camera {
         (self.view_matrix() * self.model_matrix())
             .try_inverse()
             .expect("Failed to invert mouse matrix")
-    }
-
-    /// Converts a normalized mouse position into 3D
-    fn mouse_pos(&self, pos_norm: Vec2) -> Vec3 {
-        (self.mat_i() * Vec4::new(pos_norm.x, pos_norm.y, 0.0, 1.0)).xyz()
-    }
-
-    fn mouse_move(&mut self, new_pos: Vec2) {
-        let x_norm = 2.0 * (new_pos.x / self.width - 0.5);
-        let y_norm = -2.0 * (new_pos.y / self.height - 0.5);
-        let new_pos = Vec2::new(x_norm, y_norm);
-
-        // Pan or rotate depending on current mouse state
-        match &self.mouse {
-            MouseState::Pan(_pos, orig) => {
-                let current_pos = self.mouse_pos(new_pos);
-                let delta_pos = orig - current_pos;
-                self.center += delta_pos;
-            }
-            MouseState::Rotate(pos) => {
-                let delta = new_pos - *pos;
-                self.spin(delta.x * 3.0, -delta.y * 3.0 * self.height / self.width);
-            }
-            _ => (),
-        }
-
-        // Store new mouse position
-        match &mut self.mouse {
-            MouseState::Free(pos) | MouseState::Pan(pos, ..) | MouseState::Rotate(pos) => {
-                *pos = new_pos
-            }
-            MouseState::Unknown => self.mouse = MouseState::Free(new_pos),
-        }
-    }
-
-    pub fn mouse_scroll(&mut self, delta: f32) {
-        if let MouseState::Free(pos) = self.mouse {
-            self.scale(1.0 + delta / 200.0, pos);
-        }
     }
 
     pub fn fit_verts(&mut self, verts: &[GPUVertex]) {
@@ -158,8 +92,9 @@ impl Camera {
         // the model, i.e. it's translated, then scaled, then rotated, etc.
 
         let mut lh_to_rh = Mat4::identity();
-        lh_to_rh.m22 = -1.0;
         lh_to_rh.m33 = -1.0;
+
+        let mat_quat = quat_to_mat4(&self.quat);
 
         // Convert from left handed to right handed rotations
         lh_to_rh *
@@ -167,9 +102,7 @@ impl Camera {
         // Scale to compensate for model size
         glm::scale(&i, &Vec3::new(self.scale, self.scale, self.scale)) *
 
-        // Rotation!
-        glm::rotate_x(&i, self.yaw) *
-        glm::rotate_y(&i, self.pitch) *
+        mat_quat * 
 
         // Recenter model
         glm::translate(&i, &-self.center)
@@ -186,20 +119,4 @@ impl Camera {
         glm::scale(&i, &Vec3::new(1.0, self.width / self.height, 0.1))
     }
 
-    fn spin(&mut self, dx: f32, dy: f32) {
-        self.pitch += dx;
-        self.yaw += dy;
-    }
-
-    fn scale(&mut self, value: f32, pos: Vec2) {
-        let start_pos = self.mouse_pos(pos);
-        self.scale *= value;
-        let end_pos = self.mouse_pos(pos);
-
-        let delta = start_pos - end_pos;
-        let mut delta_mouse = (self.mat() * delta.to_homogeneous()).xyz();
-        delta_mouse.z = 0.0;
-
-        self.center += (self.mat_i() * delta_mouse.to_homogeneous()).xyz();
-    }
 }
